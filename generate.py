@@ -34,14 +34,14 @@ def Read(corpus):
         for line in fout:
             l = line.encode('cp1251').decode('utf-8')
             l = l.split()
-            yield(l[0], l[1], l[2])
+            yield(l[0], l[1], l[2], int(l[3]))
 
 
 seed = ''
 length = 30
-Trigrams = Read('словарь')
+model = Read('Model')
 Dict = defaultdict(lambda: defaultdict(lambda: 0))
-for t1, t2, t3 in Trigrams:
-    Dict[t1, t2][t3] += 1
-k = GenPhrase(Dict, length, seed)
-print(k)
+for t1, t2, t3, count in model:
+    Dict[t1, t2][t3] = count
+phrase = GenPhrase(Dict, length, seed)
+print(phrase)

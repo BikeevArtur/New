@@ -1,17 +1,25 @@
 import re
 from collections import defaultdict
+import argparse
+
 
 r_alphabet = re.compile(u'[а-яА-Я0-9-]+|[.,:;?!]+')
+
 
 def GenLines(corpus):
     with open(corpus, 'r') as fout:
         for line in fout:
-            yield line.encode('cp1251').decode('utf-8').lower()
+            if args.lc:
+                yield line.encode('cp1251').decode('utf-8').lower()
+            else:
+                yield line.encode('cp1251').decode('utf-8')
+
 
 def GenTokens(lines):
     for line in lines:
         for token in r_alphabet.findall(line):
             yield token
+
 
 def TriGrams(tokens):
     token1 = '$'
@@ -36,10 +44,17 @@ def Write(dict, corpus):
                 l = '{0} {1} {2} {3}'.format(t1, t2, t3, count)
                 print(l, file = fout)
 
-lines = GenLines('Base')
+parser = argparse.ArgumentParser(description = 'создание модели частот последовательностей слов на основе текста')
+
+parser.add_argument("--input", help = 'Путь к файлу, из которого загружается текст')
+parser.add_argument("--model", help = 'Путь к файлу, в который сохраняется модель')
+parser.add_argument("--lc", action = "store_true", help = 'Приведение текста к lowercase')
+args = parser.parse_args()
+
+lines = GenLines(args.input)
 tokens = GenTokens(lines)
 trigrams = TriGrams(tokens)
 Dict = defaultdict(lambda: defaultdict(lambda: 0))
 for t1, t2, t3 in trigrams:
     Dict[t1, t2][t3] += 1
-Write(Dict, 'Model')
+Write(Dict, args.model)

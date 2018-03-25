@@ -48,7 +48,7 @@ parser.add_argument("--output", default = 'stdout', help = 'Файл, куда �
 args = parser.parse_args()
 
 seed = args.seed
-length = args.lc
+length = args.length
 model = Read(args.model)
 Dict = defaultdict(lambda: defaultdict(lambda: 0))
 for t1, t2, t3, count in model:

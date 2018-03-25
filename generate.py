@@ -1,5 +1,6 @@
 from collections import defaultdict
 import random
+import argparse
 
 
 def GenPhrase(dict, n, seed):
@@ -37,11 +38,24 @@ def Read(corpus):
             yield(l[0], l[1], l[2], int(l[3]))
 
 
-seed = ''
-length = 30
-model = Read('Model')
+parser = argparse.ArgumentParser(description = 'генератор случайных фраз на основе текста')
+
+parser.add_argument("--model", help = 'Путь к файлу, из которого загружается модель')
+parser.add_argument("--length", type = int, default = 10, help = 'Длина (количество слов и знаков препинания), '
+                                                                         'по умолчанию 10')
+parser.add_argument("--seed", default = '', help = 'Начальное слово, если не указано, выбирается случайное')
+parser.add_argument("--output", default = 'stdout', help = 'Файл, куда будет записан результат, если не указан, stdout')
+args = parser.parse_args()
+
+seed = args.seed
+length = args.lc
+model = Read(args.model)
 Dict = defaultdict(lambda: defaultdict(lambda: 0))
 for t1, t2, t3, count in model:
     Dict[t1, t2][t3] = count
 phrase = GenPhrase(Dict, length, seed)
-print(phrase)
+if args.output == 'stdout':
+    print(phrase)
+else:
+    with open(args.output, 'w', encoding="utf-8") as fout:
+        print(phrase, file=fout)

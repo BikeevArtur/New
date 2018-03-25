@@ -46,13 +46,17 @@ def Write(dict, corpus):
 
 parser = argparse.ArgumentParser(description = 'создание модели частот последовательностей слов на основе текста')
 
-parser.add_argument("--input", help = 'Путь к файлу, из которого загружается текст')
+parser.add_argument("--input", help = 'Путь к файлу, из которого загружается текст', default = "stdin")
 parser.add_argument("--model", help = 'Путь к файлу, в который сохраняется модель')
 parser.add_argument("--lc", action = "store_true", help = 'Приведение текста к lowercase')
 args = parser.parse_args()
 
-lines = GenLines(args.input)
-tokens = GenTokens(lines)
+if args.input == "stdin":
+    line = input()
+    tokens = line.split()
+else:
+    lines = GenLines(args.input)
+    tokens = GenTokens(lines)
 trigrams = TriGrams(tokens)
 Dict = defaultdict(lambda: defaultdict(lambda: 0))
 for t1, t2, t3 in trigrams:

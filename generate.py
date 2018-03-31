@@ -3,7 +3,7 @@ import random
 import argparse
 
 
-def GenPhrase(dict, n, seed):
+def gen_phrase(dict, n, seed):
     phrase = ''
     t1 = '$'
     t2 = '$'
@@ -30,7 +30,7 @@ def GenPhrase(dict, n, seed):
     return phrase.capitalize()
 
 
-def Read(corpus):
+def read(corpus):
     with open(corpus, 'r') as fout:
         for line in fout:
             l = line.encode('cp1251').decode('utf-8')
@@ -49,11 +49,11 @@ args = parser.parse_args()
 
 seed = args.seed
 length = args.length
-model = Read(args.model)
+model = read(args.model)
 Dict = defaultdict(lambda: defaultdict(lambda: 0))
 for t1, t2, t3, count in model:
     Dict[t1, t2][t3] = count
-phrase = GenPhrase(Dict, length, seed)
+phrase = gen_phrase(Dict, length, seed)
 if args.output == 'stdout':
     print(phrase)
 else:

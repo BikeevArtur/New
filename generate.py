@@ -3,29 +3,29 @@ import random
 import argparse
 
 
-def gen_phrase(dict, n, seed):
+def gen_phrase(dict, phrase_length, seed):
     phrase = ''
-    t1 = '$'
-    t2 = '$'
+    token1 = '$'
+    token2 = '$'
     if not seed == '':
         phrase = seed
-        t2 = seed
-    if dict[t1, t2] == {}:
+        token2 = seed
+    if dict[token1, token2] == {}:
         print('начальное слово отсутствует в модели')
         return ''
-    for i in range(n):
-        l = []
-        for i in dict[t1, t2]:
-            l += [i]*dict[t1, t2][i]
-        t3 = random.choice(l)
-        if t3 in ':;.,!?' or t2 == '$':
-            phrase = '{0}{1}'.format(phrase, t3)
-            if t3 in '.!?':
+    for i in range(phrase_length):
+        list = []
+        for i in dict[token1, token2]:
+            list += [i]*dict[token1, token2][i]
+        token3 = random.choice(list)
+        if token3 in ':;.,!?' or token2 == '$':
+            phrase = '{0}{1}'.format(phrase, token3)
+            if token3 in '.!?':
                 return phrase
         else:
-            phrase = '{0} {1}'.format(phrase, t3)
-        t1 = t2
-        t2 = t3
+            phrase = '{0} {1}'.format(phrase, token3)
+        token1 = token2
+        token2 = token3
     phrase += '.'
     return phrase.capitalize()
 
@@ -51,8 +51,8 @@ seed = args.seed
 length = args.length
 model = read(args.model)
 Dict = defaultdict(lambda: defaultdict(lambda: 0))
-for t1, t2, t3, count in model:
-    Dict[t1, t2][t3] = count
+for token1, token2, token3, count in model:
+    Dict[token1, token2][token3] = count
 phrase = gen_phrase(Dict, length, seed)
 if args.output == 'stdout':
     print(phrase)

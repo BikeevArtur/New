@@ -6,7 +6,7 @@ import argparse
 r_alphabet = re.compile(u'[а-яА-Я0-9-]+|[.,:;?!]+')
 
 
-def GenLines(corpus):
+def gen_lines(corpus):
     with open(corpus, 'r') as fout:
         for line in fout:
             if args.lc:
@@ -15,13 +15,13 @@ def GenLines(corpus):
                 yield line.encode('cp1251').decode('utf-8')
 
 
-def GenTokens(lines):
+def gen_tokens(lines):
     for line in lines:
         for token in r_alphabet.findall(line):
             yield token
 
 
-def TriGrams(tokens):
+def gen_trigrams(tokens):
     token1 = '$'
     token2 = '$'
     for token3 in tokens:
@@ -38,10 +38,10 @@ def TriGrams(tokens):
 
 def Write(dict, corpus):
     with open(corpus, 'w', encoding="utf-8") as fout:
-        for t1, t2 in dict:
-            for t3 in dict[t1, t2]:
-                count = Dict[t1, t2][t3]
-                l = '{0} {1} {2} {3}'.format(t1, t2, t3, count)
+        for token1, token2 in dict:
+            for token3 in dict[token1, token2]:
+                count = Dict[token1, token2][token3]
+                l = '{0} {1} {2} {3}'.format(token1, token2, token3, count)
                 print(l, file = fout)
 
 parser = argparse.ArgumentParser(description = 'создание модели частот последовательностей слов на основе текста')
@@ -55,10 +55,10 @@ if args.input == "stdin":
     line = input()
     tokens = line.split()
 else:
-    lines = GenLines(args.input)
-    tokens = GenTokens(lines)
-trigrams = TriGrams(tokens)
+    lines = gen_lines(args.input)
+    tokens = gen_tokens(lines)
+trigrams = gen_trigrams(tokens)
 Dict = defaultdict(lambda: defaultdict(lambda: 0))
-for t1, t2, t3 in trigrams:
-    Dict[t1, t2][t3] += 1
+for token1, token2, token3 in trigrams:
+    Dict[token1, token2][token3] += 1
 Write(Dict, args.model)

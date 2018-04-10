@@ -3,20 +3,20 @@ import random
 import argparse
 
 
-def gen_phrase(dict, phrase_length, seed):
+def gen_phrase(frequencies, phrase_length, seed):
     phrase = ''
     token1 = '$'
     token2 = '$'
     if not seed == '':
         phrase = seed
         token2 = seed
-    if dict[token1, token2] == {}:
+    if frequencies[token1][token2] == {}:
         print('начальное слово отсутствует в модели')
         return ''
     for i in range(phrase_length):
         list = []
-        for i in dict[token1, token2]:
-            list += [i]*dict[token1, token2][i]
+        for i in frequencies[token1][token2]:
+            list += [i]*frequencies[token1][token2][i]
         token3 = random.choice(list)
         if token3 in ':;.,!?' or token2 == '$':
             phrase = '{0}{1}'.format(phrase, token3)
@@ -50,10 +50,10 @@ args = parser.parse_args()
 seed = args.seed
 length = args.length
 model = read(args.model)
-Dict = defaultdict(lambda: defaultdict(lambda: 0))
+frequencies = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: 0)))
 for token1, token2, token3, count in model:
-    Dict[token1, token2][token3] = count
-phrase = gen_phrase(Dict, length, seed)
+    frequencies[token1][token2][token3] = count
+phrase = gen_phrase(frequencies, length, seed)
 if args.output == 'stdout':
     print(phrase)
 else:

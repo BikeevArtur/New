@@ -36,13 +36,14 @@ def gen_trigrams(tokens):
             token2 = token3
 
 
-def Write(dict, corpus):
+def Write(frequencies, corpus):
     with open(corpus, 'w', encoding="utf-8") as fout:
-        for token1, token2 in dict:
-            for token3 in dict[token1, token2]:
-                count = Dict[token1, token2][token3]
-                l = '{0} {1} {2} {3}'.format(token1, token2, token3, count)
-                print(l, file = fout)
+        for token1 in frequencies:
+            for token2 in frequencies[token1]:
+                for token3 in frequencies[token1][token2]:
+                    count = frequencies[token1][token2][token3]
+                    l = '{0} {1} {2} {3}'.format(token1, token2, token3, count)
+                    print(l, file=fout)
 
 parser = argparse.ArgumentParser(description = 'создание модели частот последовательностей слов на основе текста')
 
@@ -58,7 +59,7 @@ else:
     lines = gen_lines(args.input)
     tokens = gen_tokens(lines)
 trigrams = gen_trigrams(tokens)
-Dict = defaultdict(lambda: defaultdict(lambda: 0))
+frequencies = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: 0)))
 for token1, token2, token3 in trigrams:
-    Dict[token1, token2][token3] += 1
-Write(Dict, args.model)
+    frequencies[token1][token2][token3] += 1
+Write(frequencies, args.model)

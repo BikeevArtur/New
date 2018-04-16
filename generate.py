@@ -3,6 +3,15 @@ import random
 import argparse
 
 
+def random_choices(population, cum_weights):
+    size = len(population)
+    random_count = random.randint(1, cum_weights[size - 1])
+    i = 0
+    for i in range(size):
+        if(cum_weights[i] >= random_count):
+            return population[i]
+
+
 def gen_phrase(frequencies, phrase_length, seed):
     phrase = ''
     token1 = '$'
@@ -14,10 +23,14 @@ def gen_phrase(frequencies, phrase_length, seed):
         print('начальное слово отсутствует в модели')
         return ''
     for i in range(phrase_length):
-        list = []
-        for i in frequencies[token1][token2]:
-            list += [i]*frequencies[token1][token2][i]
-        token3 = random.choice(list)
+        token_list = []
+        weights = []
+        sum_weights = 0
+        for j in frequencies[token1][token2]:
+            token_list += [j]
+            sum_weights += frequencies[token1][token2][j]
+            weights.append(sum_weights)
+        token3 = random_choices(token_list, weights)
         if token3 in ':;.,!?' or token2 == '$':
             phrase = '{0}{1}'.format(phrase, token3)
             if token3 in '.!?':
